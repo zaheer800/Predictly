@@ -1,4 +1,4 @@
-# BettingPoolApp --- System Design Document
+# Predictlypp --- System Design Document
 
 ## Version
 
@@ -12,7 +12,7 @@ Azure-Based Implementation
 
 ## 1.1 Purpose
 
-BettingPoolApp is a public, points-based cricket prediction platform
+PredictlyApp is a public, points-based cricket prediction platform
 designed for family, friends, and colleagues (\~100 initial users).
 
 The application:
