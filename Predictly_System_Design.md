@@ -1,4 +1,4 @@
-# Predictlypp --- System Design Document
+# Predictly --- System Design Document
 
 ## Version
 
