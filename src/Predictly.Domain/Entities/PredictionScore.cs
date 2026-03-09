@@ -12,7 +12,7 @@ public class PredictionScore
     public int BonusScore2 { get; set; }
     public int BonusScore3 { get; set; }
     // TotalScore is a DB-generated computed column: winner_score + bonus_score_1 + bonus_score_2 + bonus_score_3
-    public int TotalScore { get; set; }
+    public int TotalScore { get; private set; }
     public short BonusAnsweredCount { get; set; }
     public DateTime ScoredAt { get; set; }
 

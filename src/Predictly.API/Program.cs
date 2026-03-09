@@ -4,20 +4,20 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Predictly.API.Middleware;
+using Predictly.API.Services;
 using Predictly.Application.Interfaces;
 using Predictly.Application.Services;
 using Predictly.Infrastructure.Persistence;
 using Predictly.Infrastructure.Repositories.Implementations;
 using Predictly.Infrastructure.Repositories.Interfaces;
+using Predictly.Infrastructure.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // ── Database ────────────────────────────────────────────────────────────────
 builder.Services.AddDbContext<PredictlyDbContext>(options =>
     options.UseNpgsql(
-        builder.Configuration.GetConnectionString("DefaultConnection"),
-        npgsql => npgsql.UseNodaTime()    // UTC timestamptz handling
-    ));
+        builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // ── JWT Authentication ───────────────────────────────────────────────────────
 var jwtKey = builder.Configuration["Jwt:Key"]
@@ -46,11 +46,24 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IPredictionRepository, PredictionRepository>();
 builder.Services.AddScoped<IPredictionScoreRepository, PredictionScoreRepository>();
 builder.Services.AddScoped<ILeaderboardRepository, LeaderboardRepository>();
+builder.Services.AddScoped<IMatchRepository, MatchRepository>();
+builder.Services.AddScoped<ITournamentRepository, TournamentRepository>();
+
+// ── Infrastructure Services ──────────────────────────────────────────────────
+builder.Services.AddScoped<IExcelParser, ExcelParser>();
 
 // ── Application Services ────────────────────────────────────────────────────
 builder.Services.AddScoped<IScoringEngine, ScoringEngine>();
 builder.Services.AddScoped<IMatchScoringService, MatchScoringService>();
 builder.Services.AddScoped<IPredictionService, PredictionService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<ITournamentService, TournamentService>();
+builder.Services.AddScoped<IMatchService, MatchService>();
+builder.Services.AddScoped<ILeaderboardService, LeaderboardService>();
+builder.Services.AddScoped<IAdminUploadService, AdminUploadService>();
+
+// ── API-level Services ───────────────────────────────────────────────────────
+builder.Services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
 
 // ── Controllers & Swagger ───────────────────────────────────────────────────
 builder.Services.AddControllers();

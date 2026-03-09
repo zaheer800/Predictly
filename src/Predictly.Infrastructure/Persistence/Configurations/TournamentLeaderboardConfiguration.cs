@@ -26,8 +26,8 @@ public class TournamentLeaderboardConfiguration : IEntityTypeConfiguration<Tourn
             .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasOne(t => t.User)
-            .WithOne()
-            .HasForeignKey<TournamentLeaderboard>(t => t.UserId)
+            .WithMany(u => u.TournamentLeaderboards)
+            .HasForeignKey(t => t.UserId)
             .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasIndex(t => t.TournamentId).HasDatabaseName("idx_tl_tournament_id");

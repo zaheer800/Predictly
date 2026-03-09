@@ -10,4 +10,5 @@ public interface IMatchRepository
     Task UpdateAsync(Match match, CancellationToken ct = default);
     Task<bool> ExistsByKeyAsync(int tournamentId, string teamHome, string teamAway, DateTime matchStartTime, CancellationToken ct = default);
     Task<IReadOnlyList<Match>> GetScheduledWithSelectionsAsync(int tournamentId, CancellationToken ct = default);
+    Task<Match?> GetForScoringAsync(int id, CancellationToken ct = default);
 }

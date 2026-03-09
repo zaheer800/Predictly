@@ -1,4 +1,3 @@
-using Microsoft.EntityFrameworkCore;
 using Predictly.Application.Interfaces;
 using Predictly.Domain.Enums;
 using Predictly.Domain.Exceptions;
@@ -14,18 +13,26 @@ namespace Predictly.Application.Services;
 /// </summary>
 public class MatchScoringService : IMatchScoringService
 {
+    // DbContext is injected ONLY for cross-repo transaction management (per CLAUDE.md §5.1:
+    // services must not use DbContext for data access — repositories handle all queries).
     private readonly PredictlyDbContext _db;
+    private readonly IMatchRepository _matchRepo;
+    private readonly IPredictionRepository _predictionRepo;
     private readonly IScoringEngine _scoringEngine;
     private readonly IPredictionScoreRepository _scoreRepo;
     private readonly ILeaderboardRepository _leaderboardRepo;
 
     public MatchScoringService(
         PredictlyDbContext db,
+        IMatchRepository matchRepo,
+        IPredictionRepository predictionRepo,
         IScoringEngine scoringEngine,
         IPredictionScoreRepository scoreRepo,
         ILeaderboardRepository leaderboardRepo)
     {
         _db = db;
+        _matchRepo = matchRepo;
+        _predictionRepo = predictionRepo;
         _scoringEngine = scoringEngine;
         _scoreRepo = scoreRepo;
         _leaderboardRepo = leaderboardRepo;
@@ -33,23 +40,18 @@ public class MatchScoringService : IMatchScoringService
 
     public async Task ScoreMatchAsync(int matchId, CancellationToken ct = default)
     {
+        int tournamentId;
+
         // Steps 2–9: atomic transaction
         await using var transaction = await _db.Database.BeginTransactionAsync(ct);
         try
         {
-            var match = await _db.Matches
-                .Include(m => m.BonusSelections)
-                    .ThenInclude(s => s.BonusQuestion)
-                .Include(m => m.BonusResults)
-                .FirstOrDefaultAsync(m => m.Id == matchId, ct)
+            var match = await _matchRepo.GetForScoringAsync(matchId, ct)
                 ?? throw new NotFoundException(nameof(Domain.Entities.Match), matchId);
 
             // Step 3: validate match is not already completed
             if (match.Status == MatchStatus.Completed)
                 throw new BusinessRuleException("MATCH_ALREADY_SCORED", $"Match {matchId} has already been scored.");
-
-            if (match.Status != MatchStatus.Completed)
-            { /* winner is set by admin upload before this service is called */ }
 
             if (string.IsNullOrWhiteSpace(match.Winner))
                 throw new BusinessRuleException("MISSING_WINNER", $"Match {matchId} has no winner set.");
@@ -59,10 +61,7 @@ public class MatchScoringService : IMatchScoringService
                 throw new BusinessRuleException("INCOMPLETE_BONUS_RESULTS", "All bonus question results must be submitted before scoring.");
 
             // Step 5: load all predictions with bonus answers
-            var predictions = await _db.Predictions
-                .Include(p => p.BonusAnswers)
-                .Where(p => p.MatchId == matchId)
-                .ToListAsync(ct);
+            var predictions = await _predictionRepo.GetByMatchIdAsync(matchId, ct);
 
             // Step 6: compute scores
             var scores = predictions
@@ -80,7 +79,9 @@ public class MatchScoringService : IMatchScoringService
             // Step 8: mark match completed
             match.Status = MatchStatus.Completed;
             match.UpdatedAt = DateTime.UtcNow;
-            await _db.SaveChangesAsync(ct);
+            await _matchRepo.UpdateAsync(match, ct);
+
+            tournamentId = match.TournamentId;
 
             // Step 9: commit
             await transaction.CommitAsync(ct);
@@ -92,11 +93,6 @@ public class MatchScoringService : IMatchScoringService
         }
 
         // Step 10: leaderboard rebuild — separate, idempotent, can be retried independently
-        var tournamentId = await _db.Matches
-            .Where(m => m.Id == matchId)
-            .Select(m => m.TournamentId)
-            .FirstAsync(ct);
-
         await _leaderboardRepo.RebuildTournamentLeaderboardAsync(tournamentId, ct);
         await _leaderboardRepo.RebuildGlobalLeaderboardAsync(ct);
     }

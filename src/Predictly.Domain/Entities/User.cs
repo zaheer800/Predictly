@@ -18,6 +18,6 @@ public class User
     public ICollection<Tournament> CreatedTournaments { get; set; } = [];
     public ICollection<Match> CreatedMatches { get; set; } = [];
     public ICollection<Prediction> Predictions { get; set; } = [];
-    public TournamentLeaderboard? TournamentLeaderboard { get; set; }
+    public ICollection<TournamentLeaderboard> TournamentLeaderboards { get; set; } = [];
     public GlobalLeaderboard? GlobalLeaderboard { get; set; }
 }
