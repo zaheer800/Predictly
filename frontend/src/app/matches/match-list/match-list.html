@@ -1,0 +1,16 @@
+<div class="page">
+  <h2>Matches</h2>
+  @if (loading) { <p>Loading…</p> }
+  <ul class="card-list">
+    @for (m of matches; track m.id) {
+      <li class="card">
+        <a [routerLink]="['/matches', m.id]">
+          {{ m.teamA }} vs {{ m.teamB }} — {{ m.matchStartTime | date:'mediumDate' }}
+          <span class="badge">{{ m.status }}</span>
+        </a>
+      </li>
+    } @empty {
+      @if (!loading) { <p>No matches.</p> }
+    }
+  </ul>
+</div>

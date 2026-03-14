@@ -1,0 +1,30 @@
+<div class="page">
+  <h1>Tournaments</h1>
+
+  @if (auth.isAdmin()) {
+    <div class="create-row">
+      <input [(ngModel)]="newName" placeholder="Tournament name" />
+      <button (click)="create()" [disabled]="creating || !newName.trim()">
+        {{ creating ? 'Creating…' : 'Create' }}
+      </button>
+    </div>
+  }
+
+  @if (loading) { <p>Loading…</p> }
+
+  <ul class="card-list">
+    @for (t of tournaments; track t.id) {
+      <li class="card">
+        <a [routerLink]="['/tournaments', t.id]">
+          <strong>{{ t.name }}</strong>
+          <span class="badge badge-{{ t.status.toLowerCase() }}">{{ t.status }}</span>
+        </a>
+        @if (auth.isAdmin() && t.status === 'Draft') {
+          <button class="sm" (click)="activate(t.id)">Activate</button>
+        }
+      </li>
+    } @empty {
+      <p>No tournaments yet.</p>
+    }
+  </ul>
+</div>

@@ -1,0 +1,26 @@
+<div class="page">
+  @if (loading) { <p>Loading…</p> }
+  @if (tournament) {
+    <div class="header-row">
+      <h1>{{ tournament.name }}</h1>
+      <span class="badge badge-{{ tournament.status.toLowerCase() }}">{{ tournament.status }}</span>
+    </div>
+
+    <h2>Matches</h2>
+    <ul class="card-list">
+      @for (m of matches; track m.id) {
+        <li class="card">
+          <a [routerLink]="['/matches', m.id]">
+            <strong>{{ m.teamA }} vs {{ m.teamB }}</strong>
+            <small>{{ m.matchStartTime | date:'medium' }}</small>
+            <span class="badge badge-{{ m.status.toLowerCase() }}">{{ m.status }}</span>
+            @if (m.winnerTeam) { <span class="winner">Winner: {{ m.winnerTeam }}</span> }
+          </a>
+        </li>
+      } @empty {
+        <p>No matches yet.</p>
+      }
+    </ul>
+    <a routerLink="/">← Back to Tournaments</a>
+  }
+</div>

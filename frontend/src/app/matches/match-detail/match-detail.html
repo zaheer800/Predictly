@@ -1,0 +1,38 @@
+<div class="page">
+  @if (loading) { <p>Loading…</p> }
+  @if (match) {
+    <h1>{{ match.teamA }} vs {{ match.teamB }}</h1>
+    <p>Start: {{ match.matchStartTime | date:'medium' }}
+      <span class="badge badge-{{ match.status.toLowerCase() }}">{{ match.status }}</span>
+    </p>
+    @if (match.winnerTeam) { <p class="winner">Winner: {{ match.winnerTeam }}</p> }
+
+    @if (isLocked) {
+      <div class="lock-notice">🔒 Predictions are locked — match has started.</div>
+    } @else {
+      <app-predict-form
+        [match]="match"
+        [bonusQuestions]="bonusQuestions"
+        [existing]="myPrediction"
+        (saved)="onPredictionSaved($event)" />
+    }
+
+    @if (match.status === 'Completed' && predictions.length) {
+      <h2>All Predictions</h2>
+      <table class="predictions-table">
+        <thead><tr><th>User</th><th>Predicted</th><th>Bonus Answers</th></tr></thead>
+        <tbody>
+          @for (p of predictions; track p.id) {
+            <tr>
+              <td>{{ p.userId }}</td>
+              <td>{{ p.predictedWinner }}</td>
+              <td>{{ p.bonusAnswers.length }} answered</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+
+    <a [routerLink]="['/tournaments', match.tournamentId]">← Back to Tournament</a>
+  }
+</div>

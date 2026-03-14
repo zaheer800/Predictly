@@ -1,0 +1,40 @@
+<div class="page">
+  <h1>Admin Panel</h1>
+
+  <section>
+    <h2>Submit Match Result</h2>
+    <form [formGroup]="matchResultForm" (ngSubmit)="submitResult()">
+      <div class="field">
+        <label>Match ID</label>
+        <input formControlName="matchId" placeholder="Match UUID" />
+      </div>
+      <div class="field">
+        <label>Winner Team</label>
+        <input formControlName="winnerTeam" placeholder="Exact team name" />
+      </div>
+      @if (message) { <p class="message">{{ message }}</p> }
+      <button type="submit" [disabled]="submitting || matchResultForm.invalid">
+        {{ submitting ? 'Submitting…' : 'Complete Match' }}
+      </button>
+    </form>
+  </section>
+
+  <section>
+    <h2>Bonus Question Catalog</h2>
+    <table class="lb-table">
+      <thead><tr><th>ID</th><th>Question</th><th>Type</th><th>Max Pts</th></tr></thead>
+      <tbody>
+        @for (q of catalog; track q.id) {
+          <tr>
+            <td>{{ q.id }}</td>
+            <td>{{ q.questionText }}</td>
+            <td>{{ q.questionType }}</td>
+            <td>{{ q.maxPoints }}</td>
+          </tr>
+        } @empty {
+          <tr><td colspan="4">No bonus questions seeded yet.</td></tr>
+        }
+      </tbody>
+    </table>
+  </section>
+</div>

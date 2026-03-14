@@ -1,0 +1,39 @@
+<div class="predict-form">
+  <h3>Your Prediction</h3>
+  <form [formGroup]="form" (ngSubmit)="submit()">
+    <div class="field">
+      <label>Predicted Winner</label>
+      <select formControlName="predictedWinner">
+        <option value="">-- Select winner --</option>
+        <option [value]="match.teamA">{{ match.teamA }}</option>
+        <option [value]="match.teamB">{{ match.teamB }}</option>
+      </select>
+    </div>
+
+    @if (bonusQuestions.length) {
+      <h4>Bonus Questions <small>(optional)</small></h4>
+      @for (q of bonusQuestions; track q.id) {
+        <div class="field">
+          <label>{{ q.questionText }} <small>(max {{ q.maxPoints }} pts)</small></label>
+          @if (q.questionType === 'Numeric') {
+            <input type="number" [formControlName]="'bonus_' + q.id" placeholder="Enter a number" />
+          } @else {
+            <select [formControlName]="'bonus_' + q.id">
+              <option value="">-- Select --</option>
+              @for (opt of options(q); track opt) {
+                <option [value]="opt">{{ opt }}</option>
+              }
+            </select>
+          }
+        </div>
+      }
+    }
+
+    @if (error) { <p class="error">{{ error }}</p> }
+    @if (success) { <p class="success">Prediction saved!</p> }
+
+    <button type="submit" [disabled]="saving || !form.value.predictedWinner">
+      {{ saving ? 'Saving…' : (existing ? 'Update Prediction' : 'Submit Prediction') }}
+    </button>
+  </form>
+</div>

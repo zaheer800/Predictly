@@ -1,0 +1,50 @@
+<div class="page">
+  <h1>Leaderboard</h1>
+
+  <section>
+    <h2>Global</h2>
+    @if (loading) { <p>Loading…</p> }
+    <table class="lb-table">
+      <thead><tr><th>Rank</th><th>Player</th><th>Points</th><th>Bonus Answered</th></tr></thead>
+      <tbody>
+        @for (e of global; track e.userId) {
+          <tr [class.top3]="e.rank <= 3">
+            <td>{{ e.rank }}</td>
+            <td>{{ e.username }}</td>
+            <td>{{ e.totalPoints }}</td>
+            <td>{{ e.bonusParticipationCount }}</td>
+          </tr>
+        } @empty {
+          @if (!loading) { <tr><td colspan="4">No data yet.</td></tr> }
+        }
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>By Tournament</h2>
+    <div class="field">
+      <select [(ngModel)]="selectedTournamentId" (change)="loadTournamentLeaderboard()">
+        <option value="">-- Select Tournament --</option>
+        @for (t of tournaments; track t.id) {
+          <option [value]="t.id">{{ t.name }}</option>
+        }
+      </select>
+    </div>
+    @if (tournament.length) {
+      <table class="lb-table">
+        <thead><tr><th>Rank</th><th>Player</th><th>Points</th><th>Bonus Answered</th></tr></thead>
+        <tbody>
+          @for (e of tournament; track e.userId) {
+            <tr [class.top3]="e.rank <= 3">
+              <td>{{ e.rank }}</td>
+              <td>{{ e.username }}</td>
+              <td>{{ e.totalPoints }}</td>
+              <td>{{ e.bonusParticipationCount }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  </section>
+</div>
