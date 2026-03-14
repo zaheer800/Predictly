@@ -1,0 +1,48 @@
+# .NET build output
+bin/
+obj/
+*.user
+*.suo
+.vs/
+*.log
+
+# NuGet
+*.nupkg
+packages/
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# ASP.NET
+appsettings.Development.json
+appsettings.Production.json
+
+# EF Core migrations (keep the Migrations/ folder but ignore snapshots if desired)
+# Uncomment below only if you want to ignore migration snapshots:
+# **/Migrations/*ModelSnapshot.cs
+
+# Angular
+node_modules/
+dist/
+.angular/
+.sass-cache/
+*.js.map
+
+# Environment / secrets
+.env
+.env.*
+secrets.json
+
+# OS
+.DS_Store
+Thumbs.db
+
+# JetBrains Rider
+.idea/
+*.sln.iml
+
+# Test results
+TestResults/
+coverage/
+*.coverage
+*.coveragexml

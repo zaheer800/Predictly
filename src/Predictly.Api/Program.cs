@@ -19,6 +19,8 @@ builder.Services.AddScoped<IMatchService, MatchService>();
 builder.Services.AddScoped<IPredictionService, PredictionService>();
 builder.Services.AddScoped<IScoringService, ScoringService>();
 builder.Services.AddScoped<ILeaderboardService, LeaderboardService>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IAdminService, AdminService>();
 
 // ── Auth (JWT) ─────────────────────────────────────────────────────────────
 // TODO(auth-provider): Replace placeholder key with real provider configuration
