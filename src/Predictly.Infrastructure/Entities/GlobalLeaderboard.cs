@@ -1,0 +1,17 @@
+namespace Predictly.Infrastructure.Entities;
+
+/// <summary>
+/// Precomputed global leaderboard entry per user across all tournaments.
+/// Fully rebuilt after each completed match.
+/// </summary>
+public class GlobalLeaderboard
+{
+    public Guid UserId { get; set; }
+    public int TotalPoints { get; set; }
+    public DateTimeOffset AvgFinalizedAt { get; set; }
+    public int BonusParticipationCount { get; set; }
+    public int Rank { get; set; }
+    public DateTimeOffset LastUpdatedAt { get; set; }
+
+    public User User { get; set; } = null!;
+}
